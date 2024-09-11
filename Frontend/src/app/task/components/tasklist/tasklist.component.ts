@@ -1,7 +1,7 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import { CarService } from '../../services/car.service';
+import { TaskService } from '../../services/task.service'; // Adjust the path as needed
 import { ModalService } from '../../../core/services/modal.service';
-import { Car } from '../../../shared/model/car.model';
+import { Task } from '../../../shared/model/task.model';
 import { CustomResponse } from '../../../shared/model/user.model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
@@ -11,46 +11,67 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
   styleUrls: ['./tasklist.component.css'],
 })
 export class TasklistComponent {
-  cars: Car[] = [];
-  searchedCarName: string = '';
+  tasks: Task[] = [];
+  searchedTaskTitle: string = '';
   filter: any = {};
   public showAdvancedFilters: boolean = false;
-  addCarForm: FormGroup;
-  cylinders: number[] = [4, 6, 8];
-  modelYears: number[] = [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024];
-  origins: string[] = ['usa', 'europe', 'asia', 'japan'];
+  addTaskForm: FormGroup;
+  priorityOptions: string[] = ['low', 'medium', 'high'];
+  statusOptions: string[] = ['pending', 'in-progress', 'completed', 'overdue'];
+
   @ViewChild('fileInput') fileInput: ElementRef | undefined;
+
   constructor(
-    private carService: CarService,
+    private taskService: TaskService,
     private modalService: ModalService,
     private fb: FormBuilder
   ) {
-    this.addCarForm = this.fb.group({
+    const today = new Date();
+    const dueDate = new Date(today);
+    dueDate.setDate(today.getDate() + 7);
+
+    this.addTaskForm = this.fb.group({
       id: [''],
-      name: ['', Validators.required],
-      mpg: [null, [Validators.required, Validators.min(0)]],
-      cylinders: [null, Validators.required],
-      displacement: [null, [Validators.required, Validators.min(0)]],
-      horsepower: [null, [Validators.required, Validators.min(0)]],
-      weight: [null, [Validators.required, Validators.min(0)]],
-      acceleration: [null, [Validators.required, Validators.min(0)]],
-      modelYear: [null, Validators.required],
-      origin: [null, Validators.required],
+      title: ['', Validators.required],
+      description: [''],
+      completed: [false],
+      status: ['pending', Validators.required],
+      dueDate: [dueDate.toISOString().substring(0, 10)],
+      priority: ['low'],
+      createdAt: [new Date()],
+      updatedAt: [null],
     });
   }
 
   ngOnInit(): void {
-    this.loadCars();
+    this.loadTasks();
   }
-  addNewCar() {
-    this.addCarForm.reset();
+
+  addNewTask() {
+    const today = new Date();
+    const dueDate = new Date(today);
+    dueDate.setDate(today.getDate() + 7);
+    this.addTaskForm.reset({
+      id: '',
+      title: '',
+      description: '',
+      completed: false,
+      status: 'pending',
+      dueDate: dueDate.toISOString().substring(0, 10),
+      priority: 'low',
+      createdAt: new Date(),
+      updatedAt: null,
+    });
     this.showDialog();
   }
+
   toggleAdvancedFilters() {
     this.showAdvancedFilters = !this.showAdvancedFilters;
   }
+
   isLoading: boolean = true;
-  loadCars(): void {
+
+  loadTasks(): void {
     this.isLoading = true;
     const savedFilters = localStorage.getItem('searchFilters');
     let searchParams;
@@ -58,104 +79,108 @@ export class TasklistComponent {
     if (savedFilters) {
       filter = JSON.parse(savedFilters);
     }
-    const carName = localStorage.getItem('carName');
-    this.searchedCarName = carName ? JSON.parse(carName) : '';
+    const taskTitle = localStorage.getItem('taskTitle');
+    this.searchedTaskTitle = taskTitle ? JSON.parse(taskTitle) : '';
     searchParams = {
       ...filter,
-      carName: carName ? JSON.parse(carName) : '',
+      taskTitle: taskTitle ? JSON.parse(taskTitle) : '',
     };
 
-    this.carService
-      .getCarList(searchParams)
+    this.taskService
+      .getTaskList(searchParams)
       .subscribe((res: CustomResponse) => {
         if (res.status == 'ok') {
-          this.cars = res.data;
+          this.tasks = res.data;
         } else {
-          this.cars = [];
+          this.tasks = [];
         }
-
         this.isLoading = false;
       });
   }
 
   search(): void {
-    localStorage.setItem('carName', JSON.stringify(this.searchedCarName));
+    localStorage.setItem('taskTitle', JSON.stringify(this.searchedTaskTitle));
   }
 
   showDialog(): void {
-    this.modalService.showModal('sss');
-  }
-  trackByCarId(index: number, car: Car): string {
-    return car.id; // or any unique identifier
+    this.modalService.showModal('task-modal');
   }
 
-  editCar(car: Car): void {
-    console.log('ABOUT TO PATCH', car);
-    this.addCarForm.patchValue({
-      id: car.id,
-      name: car.name,
-      mpg: car.mpg,
-      cylinders: car.cylinders,
-      displacement: car.displacement,
-      horsepower: car.horsepower,
-      weight: car.weight,
-      acceleration: car.acceleration,
-      modelYear: car.modelYear,
-      origin: car.origin,
+  trackByTaskId(index: number, task: Task): string {
+    return task.id;
+  }
+
+  editTask(task: Task): void {
+    console.log(task);
+    this.addTaskForm.patchValue({
+      id: task.id,
+      title: task.title,
+      description: task.description,
+      completed: task.completed,
+      status: task.status,
+      dueDate: task.dueDate
+        ? new Date(task.dueDate).toISOString().substring(0, 10)
+        : '',
+      priority: task.priority,
+      createdAt: task.createdAt,
+      updatedAt: task.updatedAt,
     });
     this.showDialog();
   }
 
-  deleteCar(car: Car): void {
-    if (confirm(`Are you sure you want to delete ${car.name}?`)) {
-      this.carService.deleteCar(car).subscribe((res: CustomResponse) => {
+  deleteTask(task: Task): void {
+    if (confirm(`Are you sure you want to delete ${task.title}?`)) {
+      this.taskService.deleteTask(task).subscribe((res: CustomResponse) => {
         if (res.status == 'ok') {
-          this.loadCars();
-          alert('Car deleted successfull.');
+          this.loadTasks();
+          alert('Task deleted successfully.');
         }
       });
     }
   }
+
   onFilterChanged(event: any) {
-    this.loadCars();
+    this.loadTasks();
   }
+
   onCloseDialog() {
     this.modalService.hideModal();
   }
 
   onSubmit(): void {
-    if (!this.addCarForm.valid) {
+    if (!this.addTaskForm.valid) {
       return;
     } else {
-      const newCar = this.addCarForm.value;
-      console.log(newCar);
-      if (newCar.id) {
-        this.carService.updateCar(newCar).subscribe((res: CustomResponse) => {
-          if (res.status == 'ok') {
-            this.onCloseDialog();
-            alert('Data updated successfull.');
-            this.loadCars();
-          } else {
-            alert('Data failed to save. Please try again later.');
-          }
-        });
+      const newTask = this.addTaskForm.value;
+      if (newTask.id) {
+        this.taskService
+          .updateTask(newTask)
+          .subscribe((res: CustomResponse) => {
+            if (res.status == 'ok') {
+              this.onCloseDialog();
+              alert('Task updated successfully.');
+              this.loadTasks();
+            } else {
+              alert('Failed to update task. Please try again later.');
+            }
+          });
       } else {
-        this.carService.addCar(newCar).subscribe((res: CustomResponse) => {
+        this.taskService.addTask(newTask).subscribe((res: CustomResponse) => {
           if (res.status == 'ok') {
             this.onCloseDialog();
-            alert('Data saved successfull.');
-            this.loadCars();
+            alert('Task saved successfully.');
+            this.loadTasks();
           } else {
-            alert('Data failed to save. Please try again later.');
+            alert('Failed to save task. Please try again later.');
           }
         });
       }
-
-      // this.onCloseDialog();
     }
   }
+
   selectedFileName: string = '';
   selectedFile: any = null;
+
   onFileChange(event: any): void {
     const file = event.target.files[0] as File | null;
     if (file) {
@@ -169,21 +194,27 @@ export class TasklistComponent {
       this.selectedFile = file;
     }
   }
+
   selectCSV() {
     this.fileInput?.nativeElement.click();
   }
+
   isUploading: boolean = false;
+
   onUploadCSV() {
     if (this.isUploading) return;
     this.isUploading = true;
-    this.carService
+    this.taskService
       .uploadCsv(this.selectedFile)
       .subscribe((res: CustomResponse) => {
         if (res.status == 'ok') {
-          alert('Data uploaded successfull.');
-          this.loadCars();
+          alert('Data uploaded successfully.');
+          this.loadTasks();
           this.selectedFile = null;
           this.selectedFileName = '';
+          this.isUploading = false;
+        } else {
+          alert('Failed to upload data. Please try again later.');
           this.isUploading = false;
         }
       });

@@ -1,3 +1,3 @@
 export const environments = {
-  apiUrl: 'http://roshanaalemagar.com:8082',
+  apiUrl: 'http://localhost:8082',
 };

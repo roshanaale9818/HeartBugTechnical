@@ -3,10 +3,10 @@
 
   <div class="row mb-3">
     <div class="col-md-8 text-left">
-      <button class="btn btn-primary mr-2" (click)="addNewCar()">
-        Add New Car
+      <button class="btn btn-primary mr-2" (click)="addNewTask()">
+        Add New Task
       </button>
-      <input
+      <!-- <input
         type="file"
         accept=".csv"
         (change)="onFileChange($event)"
@@ -15,14 +15,14 @@
       />
       <button class="btn btn-info text-white mr-2" (click)="selectCSV()">
         Upload CSV
-      </button>
+      </button> -->
       <ng-container *ngIf="selectedFileName">
         {{ selectedFileName }}
         <button
           class="btn btn-success btn-sm text-white mr-2"
           (click)="onUploadCSV()"
         >
-          {{ isUploading ? "Uploading..." : "  Upload" }}
+          {{ isUploading ? "Uploading..." : "Upload" }}
         </button>
       </ng-container>
     </div>
@@ -43,27 +43,23 @@
       <input
         type="text"
         class="form-control"
-        placeholder="Search cars Eg. Toyota"
-        [(ngModel)]="searchedCarName"
+        placeholder="Search tasks Eg. Task Title"
+        [(ngModel)]="searchedTaskTitle"
         (ngModelChange)="search()"
       />
     </div>
   </div>
 
-  <!-- Car Table -->
+  <!-- Task Table -->
   <div class="table-responsive">
     <table class="table table-striped table-bordered mt-4">
       <thead>
         <tr>
-          <th>Name</th>
-          <th>MPG</th>
-          <th>Cylinders</th>
-          <th>Displacement</th>
-          <th>Horsepower</th>
-          <th>Weight</th>
-          <th>Acceleration</th>
-          <th>Model Year</th>
-          <th>Origin</th>
+          <th>Title</th>
+          <th>Description</th>
+          <th>Status</th>
+          <th>Due Date</th>
+          <th>Priority</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -75,34 +71,33 @@
         </ng-container>
 
         <ng-container *ngIf="!isLoading">
-          <ng-container *ngIf="cars && cars.length > 0">
-            <tr *ngFor="let car of cars; trackBy: trackByCarId">
-              <td>{{ car.name }}</td>
-              <td>{{ car.mpg }}</td>
-              <td>{{ car.cylinders }}</td>
-              <td>{{ car.displacement }}</td>
-              <td>{{ car.horsepower }}</td>
-              <td>{{ car.weight }}</td>
-              <td>{{ car.acceleration }}</td>
-              <td>{{ car.modelYear }}</td>
-              <td>{{ car.origin | capitalize }}</td>
+          <ng-container *ngIf="tasks && tasks.length > 0">
+            <tr *ngFor="let task of tasks; trackBy: trackByTaskId">
+              <td>{{ task.title }}</td>
+              <td>{{ task.description }}</td>
+              <td>{{ task.status | capitalize }}</td>
+              <td>{{ task.dueDate | date }}</td>
+              <td>{{ task.priority ? (task.priority | capitalize) : "" }}</td>
               <td>
                 <button
                   class="btn btn-warning btn-sm mr-2"
-                  (click)="editCar(car)"
+                  (click)="editTask(task)"
                 >
                   Edit
                 </button>
 
-                <button class="btn btn-danger btn-sm" (click)="deleteCar(car)">
+                <button
+                  class="btn btn-danger btn-sm"
+                  (click)="deleteTask(task)"
+                >
                   Delete
                 </button>
               </td>
             </tr>
           </ng-container>
-          <ng-container *ngIf="!cars || cars.length === 0">
+          <ng-container *ngIf="!tasks || tasks.length === 0">
             <tr class="alert alert-info" role="alert">
-              <td colspan="10" class="text-center">No cars found.</td>
+              <td colspan="6" class="text-center">No tasks found.</td>
             </tr>
           </ng-container>
         </ng-container>
@@ -111,290 +106,129 @@
   </div>
 </div>
 
-<app-modal title="Car Form">
-  <form [formGroup]="addCarForm" (ngSubmit)="onSubmit()">
+<app-modal title="Task Form">
+  <form [formGroup]="addTaskForm" (ngSubmit)="onSubmit()">
     <div class="form-group row">
-      <label for="name" class="col-sm-4 col-form-label"
-        >Name<span class="text-danger">*</span></label
-      >
+      <label for="title" class="col-sm-4 col-form-label">
+        Title<span class="text-danger">*</span>
+      </label>
       <div class="col-sm-8">
         <input
           type="text"
-          id="name"
+          id="title"
           class="form-control"
-          formControlName="name"
+          formControlName="title"
           [ngClass]="{
             'is-invalid':
-              addCarForm.get('name')?.invalid &&
-              (addCarForm.get('name')?.dirty || addCarForm.get('name')?.touched)
+              addTaskForm.get('title')?.invalid &&
+              (addTaskForm.get('title')?.dirty ||
+                addTaskForm.get('title')?.touched)
           }"
         />
         <div
           *ngIf="
-            addCarForm.get('name')?.invalid &&
-            (addCarForm.get('name')?.dirty || addCarForm.get('name')?.touched)
+            addTaskForm.get('title')?.invalid &&
+            (addTaskForm.get('title')?.dirty ||
+              addTaskForm.get('title')?.touched)
           "
           class="invalid-feedback"
         >
-          Name is required.
+          Title is required.
         </div>
       </div>
     </div>
 
-    <!-- MPG -->
+    <!-- Description -->
     <div class="form-group row">
-      <label for="mpg" class="col-sm-4 col-form-label"
-        >MPG<span class="text-danger">*</span></label
-      >
+      <label for="description" class="col-sm-4 col-form-label">
+        Description
+      </label>
       <div class="col-sm-8">
-        <input
-          type="number"
-          id="mpg"
+        <textarea
+          id="description"
           class="form-control"
-          formControlName="mpg"
-          [ngClass]="{
-            'is-invalid':
-              addCarForm.get('mpg')?.invalid &&
-              (addCarForm.get('mpg')?.dirty || addCarForm.get('mpg')?.touched)
-          }"
-        />
-        <div
-          *ngIf="
-            addCarForm.get('mpg')?.invalid &&
-            (addCarForm.get('mpg')?.dirty || addCarForm.get('mpg')?.touched)
-          "
-          class="invalid-feedback"
-        >
-          MPG is required and must be a positive number.
-        </div>
+          formControlName="description"
+        ></textarea>
       </div>
     </div>
 
-    <!-- Cylinders -->
+    <!-- Status -->
     <div class="form-group row">
-      <label for="cylinders" class="col-sm-4 col-form-label"
-        >Cylinders<span class="text-danger">*</span></label
-      >
+      <label for="status" class="col-sm-4 col-form-label">
+        Status<span class="text-danger">*</span>
+      </label>
       <div class="col-sm-8">
         <select
-          id="cylinders"
+          id="status"
           class="form-control"
-          formControlName="cylinders"
+          formControlName="status"
           [ngClass]="{
             'is-invalid':
-              addCarForm.get('cylinders')?.invalid &&
-              (addCarForm.get('cylinders')?.dirty ||
-                addCarForm.get('cylinders')?.touched)
+              addTaskForm.get('status')?.invalid &&
+              (addTaskForm.get('status')?.dirty ||
+                addTaskForm.get('status')?.touched)
           }"
         >
-          <option value="">Select Cylinders</option>
-          <option *ngFor="let cylinder of cylinders" [value]="cylinder">
-            {{ cylinder }} Cylinders
+          <option value="">Select Status</option>
+          <option *ngFor="let status of statusOptions" [value]="status">
+            {{ status | capitalize }}
           </option>
         </select>
         <div
           *ngIf="
-            addCarForm.get('cylinders')?.invalid &&
-            (addCarForm.get('cylinders')?.dirty ||
-              addCarForm.get('cylinders')?.touched)
+            addTaskForm.get('status')?.invalid &&
+            (addTaskForm.get('status')?.dirty ||
+              addTaskForm.get('status')?.touched)
           "
           class="invalid-feedback"
         >
-          Cylinders is required.
+          Status is required.
         </div>
       </div>
     </div>
 
-    <!-- Displacement -->
+    <!-- Due Date -->
     <div class="form-group row">
-      <label for="displacement" class="col-sm-4 col-form-label"
-        >Displacement<span class="text-danger">*</span></label
-      >
+      <label for="dueDate" class="col-sm-4 col-form-label"> Due Date </label>
       <div class="col-sm-8">
         <input
-          type="number"
-          id="displacement"
+          type="date"
+          id="dueDate"
           class="form-control"
-          formControlName="displacement"
-          [ngClass]="{
-            'is-invalid':
-              addCarForm.get('displacement')?.invalid &&
-              (addCarForm.get('displacement')?.dirty ||
-                addCarForm.get('displacement')?.touched)
-          }"
+          formControlName="dueDate"
         />
-        <div
-          *ngIf="
-            addCarForm.get('displacement')?.invalid &&
-            (addCarForm.get('displacement')?.dirty ||
-              addCarForm.get('displacement')?.touched)
-          "
-          class="invalid-feedback"
-        >
-          Displacement is required and must be a positive number.
-        </div>
       </div>
     </div>
 
-    <!-- Horsepower -->
+    <!-- Priority -->
     <div class="form-group row">
-      <label for="horsepower" class="col-sm-4 col-form-label"
-        >Horsepower<span class="text-danger">*</span></label
-      >
-      <div class="col-sm-8">
-        <input
-          type="number"
-          id="horsepower"
-          class="form-control"
-          formControlName="horsepower"
-          [ngClass]="{
-            'is-invalid':
-              addCarForm.get('horsepower')?.invalid &&
-              (addCarForm.get('horsepower')?.dirty ||
-                addCarForm.get('horsepower')?.touched)
-          }"
-        />
-        <div
-          *ngIf="
-            addCarForm.get('horsepower')?.invalid &&
-            (addCarForm.get('horsepower')?.dirty ||
-              addCarForm.get('horsepower')?.touched)
-          "
-          class="invalid-feedback"
-        >
-          Horsepower is required and must be a positive number.
-        </div>
-      </div>
-    </div>
-
-    <!-- Weight -->
-    <div class="form-group row">
-      <label for="weight" class="col-sm-4 col-form-label"
-        >Weight<span class="text-danger">*</span></label
-      >
-      <div class="col-sm-8">
-        <input
-          type="number"
-          id="weight"
-          class="form-control"
-          formControlName="weight"
-          [ngClass]="{
-            'is-invalid':
-              addCarForm.get('weight')?.invalid &&
-              (addCarForm.get('weight')?.dirty ||
-                addCarForm.get('weight')?.touched)
-          }"
-        />
-        <div
-          *ngIf="
-            addCarForm.get('weight')?.invalid &&
-            (addCarForm.get('weight')?.dirty ||
-              addCarForm.get('weight')?.touched)
-          "
-          class="invalid-feedback"
-        >
-          Weight is required and must be a positive number.
-        </div>
-      </div>
-    </div>
-
-    <!-- Acceleration -->
-    <div class="form-group row">
-      <label for="acceleration" class="col-sm-4 col-form-label"
-        >Acceleration<span class="text-danger">*</span></label
-      >
-      <div class="col-sm-8">
-        <input
-          type="number"
-          id="acceleration"
-          class="form-control"
-          formControlName="acceleration"
-          [ngClass]="{
-            'is-invalid':
-              addCarForm.get('acceleration')?.invalid &&
-              (addCarForm.get('acceleration')?.dirty ||
-                addCarForm.get('acceleration')?.touched)
-          }"
-        />
-        <div
-          *ngIf="
-            addCarForm.get('acceleration')?.invalid &&
-            (addCarForm.get('acceleration')?.dirty ||
-              addCarForm.get('acceleration')?.touched)
-          "
-          class="invalid-feedback"
-        >
-          Acceleration is required and must be a positive number.
-        </div>
-      </div>
-    </div>
-
-    <!-- Model Year -->
-    <div class="form-group row">
-      <label for="modelYear" class="col-sm-4 col-form-label"
-        >Model Year<span class="text-danger">*</span></label
-      >
+      <label for="priority" class="col-sm-4 col-form-label"> Priority </label>
       <div class="col-sm-8">
         <select
-          id="modelYear"
+          id="priority"
           class="form-control"
-          formControlName="modelYear"
+          formControlName="priority"
           [ngClass]="{
             'is-invalid':
-              addCarForm.get('modelYear')?.invalid &&
-              (addCarForm.get('modelYear')?.dirty ||
-                addCarForm.get('modelYear')?.touched)
+              addTaskForm.get('priority')?.invalid &&
+              (addTaskForm.get('priority')?.dirty ||
+                addTaskForm.get('priority')?.touched)
           }"
         >
-          <option value="">Select Model Year</option>
-          <option *ngFor="let year of modelYears" [value]="year">
-            {{ year }}
+          <option value="">Select Priority</option>
+          <option *ngFor="let priority of priorityOptions" [value]="priority">
+            {{ priority | capitalize }}
           </option>
         </select>
         <div
           *ngIf="
-            addCarForm.get('modelYear')?.invalid &&
-            (addCarForm.get('modelYear')?.dirty ||
-              addCarForm.get('modelYear')?.touched)
+            addTaskForm.get('priority')?.invalid &&
+            (addTaskForm.get('priority')?.dirty ||
+              addTaskForm.get('priority')?.touched)
           "
           class="invalid-feedback"
         >
-          Model Year is required.
-        </div>
-      </div>
-    </div>
-
-    <!-- Origin -->
-    <div class="form-group row">
-      <label for="origin" class="col-sm-4 col-form-label"
-        >Origin<span class="text-danger">*</span></label
-      >
-      <div class="col-sm-8">
-        <select
-          id="origin"
-          class="form-control"
-          formControlName="origin"
-          [ngClass]="{
-            'is-invalid':
-              addCarForm.get('origin')?.invalid &&
-              (addCarForm.get('origin')?.dirty ||
-                addCarForm.get('origin')?.touched)
-          }"
-        >
-          <option value="">Select Origin</option>
-          <option *ngFor="let origin of origins" [value]="origin">
-            {{ origin | capitalize }}
-          </option>
-        </select>
-        <div
-          *ngIf="
-            addCarForm.get('origin')?.invalid &&
-            (addCarForm.get('origin')?.dirty ||
-              addCarForm.get('origin')?.touched)
-          "
-          class="invalid-feedback"
-        >
-          Origin is required.
+          Priority is required.
         </div>
       </div>
     </div>

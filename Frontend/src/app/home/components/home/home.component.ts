@@ -1,58 +1,59 @@
 import { Component } from '@angular/core';
-import { ModalService } from '../../../core/services/modal.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { CarService } from '../../../car/services/car.service';
-import { CustomResponse } from '../../../shared/model/user.model';
+import { ModalService } from '../../../core/services/modal.service';
+import { TaskService } from '../../../task/services/task.service';
+import { Task } from '../../../shared/model/task.model';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrl: './home.component.css',
+  styleUrls: ['./home.component.css'],
 })
 export class HomeComponent {
-  addCarForm: FormGroup;
-  cylinders: number[] = [4, 6, 8];
-  modelYears: number[] = [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024];
-  origins: string[] = ['usa', 'europe', 'asia', 'japan'];
+  addTaskForm: FormGroup;
 
   constructor(
     private fb: FormBuilder,
     private modalService: ModalService,
-    private carService: CarService
+    private taskService: TaskService
   ) {
-    this.addCarForm = this.fb.group({
-      name: ['', Validators.required],
-      mpg: [null, [Validators.required, Validators.min(0)]],
-      cylinders: [null, Validators.required],
-      displacement: [null, [Validators.required, Validators.min(0)]],
-      horsepower: [null, [Validators.required, Validators.min(0)]],
-      weight: [null, [Validators.required, Validators.min(0)]],
-      acceleration: [null, [Validators.required, Validators.min(0)]],
-      modelYear: [null, Validators.required],
-      origin: [null, Validators.required],
+    const today = new Date();
+    const dueDate = new Date(today);
+    dueDate.setDate(today.getDate() + 7);
+    this.addTaskForm = this.fb.group({
+      title: ['', Validators.required],
+      description: [''],
+      completed: [false],
+      status: ['pending', Validators.required],
+      dueDate: [dueDate.toISOString().substring(0, 10)],
+      priority: ['low'],
+      createdAt: [new Date(), Validators.required],
+      updatedAt: [''],
     });
   }
 
   ngOnInit(): void {}
 
   onSubmit(): void {
-    if (!this.addCarForm.valid) {
+    if (!this.addTaskForm.valid) {
       return;
     } else {
-      const newCar = this.addCarForm.value;
+      const newTask: Task = this.addTaskForm.value;
       this.onCloseDialog();
-      this.carService.addCar(newCar).subscribe((data: CustomResponse) => {
-        if (data.status == 'ok') {
-          alert('Car added successfull.');
+      this.taskService.addTask(newTask).subscribe((response) => {
+        if (response.status === 'ok') {
+          alert('Task added successfully.');
         } else {
           alert('Saving failed. Please try again later.');
         }
       });
     }
   }
+
   onShowModal() {
-    this.modalService.showModal('sss');
+    this.modalService.showModal('Task Form');
   }
+
   onCloseDialog() {
     this.modalService.hideModal();
   }

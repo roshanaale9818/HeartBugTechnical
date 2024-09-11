@@ -39,13 +39,18 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 // making upload folder static for accessing
 app.get("/", (req, res) => {
-  res.json({ status: "ok", message: "Welcome to Node js app for firehawk" });
+  res.json({
+    status: "ok",
+    message: "Welcome to Node js app for heartbug technical challenge",
+  });
 });
-app.post("/car", async (req, res) => {
+app.post("/task", async (req, res) => {
   try {
     const data = req.body;
     delete data.id;
-    const docRef = await db.collection("cars").add(data);
+    delete data.updatedAt;
+    const _data = data;
+    const docRef = await db.collection("tasks").add(_data);
     return res.status(201).send({
       status: "ok",
       message: "Data saved successfull",
@@ -57,43 +62,36 @@ app.post("/car", async (req, res) => {
 });
 
 // get all
-app.get("/car", async (req, res) => {
+app.get("/task", async (req, res) => {
   try {
     // Extract filter parameters from the request query
-    const {
-      // horsepowerMax = 10000,
-      horsepowerMin,
-      selectedCylinder,
-      selectedModelYear,
-      selectedOrigin,
-      carName,
-    } = req.query;
+    const { title, status, priority, dueDate } = req.query;
 
-    // Start with the cars collection reference
-    let carsQuery = db.collection("cars");
+    // Start with the tasks collection reference
+    let tasksQuery = db.collection("tasks");
 
     // Apply filters based on the provided criteria
-    if (selectedCylinder) {
-      carsQuery = carsQuery.where("cylinders", "==", selectedCylinder);
+    if (title) {
+      tasksQuery = tasksQuery.where("title", "==", title);
     }
 
-    if (selectedModelYear) {
-      carsQuery = carsQuery.where("modelYear", "==", selectedModelYear);
+    if (status) {
+      tasksQuery = tasksQuery.where("status", "==", status);
     }
 
-    if (selectedOrigin) {
-      carsQuery = carsQuery.where("origin", "==", selectedOrigin);
+    if (priority) {
+      tasksQuery = tasksQuery.where("priority", "==", priority);
     }
 
-    if (carName) {
-      carsQuery = carsQuery.where("name", "==", carName);
+    if (dueDate) {
+      tasksQuery = tasksQuery.where("dueDate", ">=", new Date(dueDate));
     }
 
     // Fetch the filtered data
-    const carsSnapshot = await carsQuery.get();
+    const tasksSnapshot = await tasksQuery.get();
 
-    // Map the results to an array of car objects
-    const cars = carsSnapshot.docs.map((doc) => ({
+    // Map the results to an array of task objects
+    const tasks = tasksSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
@@ -101,7 +99,7 @@ app.get("/car", async (req, res) => {
     return res.status(200).send({
       status: "ok",
       message: "Filtered data retrieved successfully",
-      data: cars,
+      data: tasks,
     });
   } catch (error) {
     return res.status(500).send({ status: "error", message: error.message });
@@ -109,11 +107,11 @@ app.get("/car", async (req, res) => {
 });
 
 // delete
-app.delete("/car/:id", async (req, res) => {
+app.delete("/task/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const carRef = db.collection("cars").doc(id);
-    const doc = await carRef.get();
+    const taskRef = db.collection("tasks").doc(id);
+    const doc = await taskRef.get();
     if (!doc.exists) {
       return res.status(404).send({
         status: "error",
@@ -122,11 +120,11 @@ app.delete("/car/:id", async (req, res) => {
     }
 
     // Delete the document
-    await carRef.delete();
+    await taskRef.delete();
 
     return res.status(200).send({
       status: "ok",
-      message: "Car deleted successfully",
+      message: "Task deleted successfully",
     });
   } catch (error) {
     return res.status(500).send({ status: "error", message: error.message });
@@ -134,15 +132,15 @@ app.delete("/car/:id", async (req, res) => {
 });
 
 // update
-app.put("/car/:id", async (req, res) => {
+app.put("/task/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const updatedData = req.body;
     // Reference to the specific document in the 'cars' collection
-    const carRef = db.collection("cars").doc(id);
+    const taskRef = db.collection("tasks").doc(id);
 
     // Check if the document exists
-    const doc = await carRef.get();
+    const doc = await taskRef.get();
     if (!doc.exists) {
       return res.status(404).send({
         status: "error",
@@ -151,11 +149,11 @@ app.put("/car/:id", async (req, res) => {
     }
 
     // Update the document with the new data
-    await carRef.update(updatedData);
+    await taskRef.update(updatedData);
 
     return res.status(200).send({
       status: "ok",
-      message: "Car updated successfully",
+      message: "Task updated successfully",
     });
   } catch (error) {
     return res.status(500).send({ status: "error", message: error.message });

@@ -9,76 +9,83 @@ import {
 } from '@angular/forms';
 import { ModalService } from '../../../core/services/modal.service';
 import { ModalComponent } from '../../../shared/components/modal/modal.component';
-import { Car } from '../../../shared/model/car.model';
+import { Task } from '../../../shared/model/task.model';
+import { CapitalizePipe } from '../../../shared/pipes/capitalize.pipe';
+import { SharedModule } from '../../../shared/shared.module';
 
 @Component({
   selector: 'app-task-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, ModalComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    ModalComponent,
+    SharedModule,
+  ],
   templateUrl: './task-form.component.html',
   styleUrl: './task-form.component.css',
 })
 export class TaskFormComponent {
-  addCarForm: FormGroup;
-  cylinders: number[] = [4, 6, 8];
-  modelYears: number[] = [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024];
-  origins: string[] = ['USA', 'Europe', 'Asia'];
-  @Input() btnLabel: string = 'Add New Car';
-  @Input() data: Car = {
-    mpg: 0,
+  addTaskForm: FormGroup;
+  priorityOptions: string[] = ['low', 'medium', 'high'];
+  statusOptions: string[] = ['pending', 'in-progress', 'completed', 'overdue'];
+
+  @Input() btnLabel: string = 'Add New Task';
+  @Input() data: Task = {
     id: '',
-    acceleration: 0,
-    cylinders: 0,
-    displacement: 0,
-    horsepower: 0,
-    weight: 0,
-    modelYear: 0,
-    origin: '',
-    name: '',
+    title: '',
+    description: '',
+    completed: false,
+    status: 'pending',
+    priority: 'medium',
+    dueDate: undefined,
+    createdAt: new Date(),
   };
+
   constructor(private fb: FormBuilder, private modalService: ModalService) {
-    this.addCarForm = this.fb.group({
+    this.addTaskForm = this.fb.group({
       id: [''],
-      name: ['', Validators.required],
-      mpg: [null, [Validators.required, Validators.min(0)]],
-      cylinders: [null, Validators.required],
-      displacement: [null, [Validators.required, Validators.min(0)]],
-      horsepower: [null, [Validators.required, Validators.min(0)]],
-      weight: [null, [Validators.required, Validators.min(0)]],
-      acceleration: [null, [Validators.required, Validators.min(0)]],
-      modelYear: [null, Validators.required],
-      origin: [null, Validators.required],
+      title: ['', Validators.required],
+      description: [''],
+      status: ['pending', Validators.required],
+      priority: ['medium', Validators.required],
+      dueDate: [null],
+      completed: [false],
+      createdAt: [new Date(), Validators.required],
+      updatedAt: [null],
     });
   }
 
   ngOnInit(): void {}
 
   onSubmit(): void {
-    if (!this.addCarForm.valid) {
+    if (!this.addTaskForm.valid) {
       return;
     } else {
-      const newCar = this.addCarForm.value;
+      const newTask = this.addTaskForm.value;
       this.onCloseDialog();
     }
   }
+
   onShowModal() {
     this.modalService.showModal('');
     if (this.data && this.data.id) {
-      // Set the form values with the data from the Car object
-      this.addCarForm.patchValue({
+      // Set the form values with the data from the Task object
+      this.addTaskForm.patchValue({
         id: this.data.id,
-        name: this.data.name,
-        mpg: this.data.mpg,
-        cylinders: this.data.cylinders,
-        displacement: this.data.displacement,
-        horsepower: this.data.horsepower,
-        weight: this.data.weight,
-        acceleration: this.data.acceleration,
-        modelYear: this.data.modelYear,
-        origin: this.data.origin,
+        title: this.data.title,
+        description: this.data.description,
+        status: this.data.status,
+        priority: this.data.priority,
+        dueDate: this.data.dueDate,
+        completed: this.data.completed,
+        createdAt: this.data.createdAt,
+        updatedAt: this.data.updatedAt,
       });
     }
   }
+
   onCloseDialog() {
     this.modalService.hideModal();
   }

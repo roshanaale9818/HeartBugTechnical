@@ -3,14 +3,15 @@ import { Injectable } from '@angular/core';
 import { Car } from '../../shared/model/car.model';
 import { Observable } from 'rxjs';
 import { environments } from '../../environments/environment.prod';
+import { Task } from '../../shared/model/task.model';
 @Injectable({
   providedIn: 'root',
 })
 export class TaskService {
   constructor(private http: HttpClient) {}
   apiUrl: string = environments.apiUrl;
-  addTask(car: Car): Observable<any> {
-    return this.http.post(`${this.apiUrl}/car`, car);
+  addTask(task: Task): Observable<any> {
+    return this.http.post(`${this.apiUrl}/task`, task);
   }
   getTaskList(params: any): Observable<any> {
     let httpParams = new HttpParams();
@@ -23,13 +24,13 @@ export class TaskService {
     });
 
     // Make the GET request with the query parameters
-    return this.http.get(`${this.apiUrl}/car`, { params: httpParams });
+    return this.http.get(`${this.apiUrl}/task`, { params: httpParams });
   }
-  deleteTask(car: any): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/car/${car.id}`);
+  deleteTask(task: Task): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/task/${task.id}`);
   }
-  updateTask(car: Car): Observable<any> {
-    return this.http.put(`${this.apiUrl}/car/${car.id}`, car);
+  updateTask(task: Task): Observable<any> {
+    return this.http.put(`${this.apiUrl}/task/${task.id}`, task);
   }
 
   uploadCsv(file: File): Observable<any> {
