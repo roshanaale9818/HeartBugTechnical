@@ -1,0 +1,44 @@
+.modal {
+  display: block; /* Ensure the modal is displayed */
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  z-index: 999; /* Ensure it sits behind the modal */
+  opacity: 0;
+  transition: opacity 0.3s ease; /* Fade-in and fade-out transition */
+}
+
+.modal.show .modal-backdrop {
+  opacity: 1;
+}
+
+.modal-dialog {
+  z-index: 1050; /* Ensure it's above the backdrop */
+  position: relative;
+  top: 10%;
+  transform: translateY(-30px); /* Initial position for slide effect */
+  opacity: 0; /* Initial opacity for fade effect */
+  transition: transform 0.3s ease, opacity 0.3s ease; /* Slide and fade transition */
+}
+
+.modal.show .modal-dialog {
+  transform: translateY(0); /* Final position */
+  opacity: 1; /* Final opacity */
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between; /* Correct spacing for header elements */
+}
+
+.close {
+  font-size: 1.5rem; /* Adjust size as needed */
+  background: none;
+  border: none;
+}

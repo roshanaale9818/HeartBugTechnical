@@ -1,0 +1,28 @@
+/* You can add global styles to this file, and also import other style files */
+* {
+  margin: 0;
+  padding: 0;
+}
+html {
+  margin: 0;
+}
+body {
+  margin: 0;
+  padding: 0;
+  /* overflow: hidden; */
+}
+.h-80vh {
+  height: 80vh;
+}
+.mr-2 {
+  margin-right: 20px;
+}
+.form-group {
+  margin-top: 10px;
+}
+.is-invalid {
+  border-color: #dc3545;
+}
+.mr-1 {
+  margin-right: 10px;
+}

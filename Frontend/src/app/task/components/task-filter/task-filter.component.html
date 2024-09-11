@@ -1,0 +1,66 @@
+<div class="container mt-4 p-4 border rounded bg-light">
+  <h3 class="mb-4 text-primary">Filter Tasks</h3>
+
+  <form [formGroup]="filterForm" (ngSubmit)="applyFilters()">
+    <!-- Task Title Filter -->
+    <div class="form-group row">
+      <label for="title" class="col-sm-2 col-form-label">Task Title</label>
+      <div class="col-sm-10">
+        <input
+          type="text"
+          id="title"
+          class="form-control"
+          formControlName="title"
+          placeholder="Enter task title"
+        />
+      </div>
+    </div>
+
+    <!-- Status Filter -->
+    <div class="form-group row">
+      <label for="status" class="col-sm-2 col-form-label">Status</label>
+      <div class="col-sm-10">
+        <select id="status" class="form-control" formControlName="status">
+          <option [ngValue]="null">Any</option>
+          <option value="pending">Pending</option>
+          <option value="in-progress">In Progress</option>
+          <option value="completed">Completed</option>
+          <option value="overdue">Overdue</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Priority Filter -->
+    <div class="form-group row">
+      <label for="priority" class="col-sm-2 col-form-label">Priority</label>
+      <div class="col-sm-10">
+        <select id="priority" class="form-control" formControlName="priority">
+          <option [ngValue]="null">Any</option>
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Due Date Filter -->
+    <div class="form-group row">
+      <label for="dueDate" class="col-sm-2 col-form-label">Due Date</label>
+      <div class="col-sm-10">
+        <input
+          type="date"
+          id="dueDate"
+          class="form-control"
+          formControlName="dueDate"
+        />
+      </div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="form-group row">
+      <div class="col-sm-12 text-right">
+        <button type="submit" class="btn btn-success">Search</button>
+      </div>
+    </div>
+  </form>
+</div>

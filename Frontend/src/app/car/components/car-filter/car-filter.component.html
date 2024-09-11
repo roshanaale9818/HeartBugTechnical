@@ -1,0 +1,114 @@
+<div class="container mt-4 p-4 border rounded bg-light">
+  <h3 class="mb-4 text-primary">Filter Cars</h3>
+
+  <form [formGroup]="filterForm" (ngSubmit)="applyFilters()">
+    <!-- MPG Filter -->
+    <div class="form-group row">
+      <!-- <label for="mpgMin" class="col-sm-2 col-form-label">MPG (Min)</label>
+      <div class="col-sm-4">
+        <input
+          type="number"
+          id="mpgMin"
+          class="form-control"
+          formControlName="mpgMin"
+        />
+      </div> -->
+      <!-- <label for="mpgMax" class="col-sm-2 col-form-label">MPG (Max)</label>
+      <div class="col-sm-4">
+        <input
+          type="number"
+          id="mpgMax"
+          class="form-control"
+          formControlName="mpgMax"
+        />
+      </div> -->
+    </div>
+
+    <!-- Cylinders Filter -->
+    <div class="form-group row">
+      <label for="cylinders" class="col-sm-2 col-form-label">Cylinders</label>
+      <div class="col-sm-10">
+        <div class="form-check" *ngFor="let cylinder of cylinders">
+          <input
+            type="radio"
+            class="form-check-input"
+            name="selectedCylinder"
+            [id]="'cylinder-' + cylinder"
+            [value]="cylinder === 0 ? null : cylinder"
+            formControlName="selectedCylinder"
+          />
+          <label class="form-check-label" [for]="'cylinder-' + cylinder">
+            {{ cylinder === 0 ? "Any" : cylinder }} Cylinders
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Horsepower Filter -->
+    <!-- <div class="form-group row">
+      <label for="horsepowerMin" class="col-sm-2 col-form-label"
+        >Horsepower (Min)</label
+      >
+      <div class="col-sm-4">
+        <input
+          type="number"
+          id="horsepowerMin"
+          class="form-control"
+          formControlName="horsepowerMin"
+        />
+      </div>
+      <label for="horsepowerMax" class="col-sm-2 col-form-label"
+        >Horsepower (Max)</label
+      >
+      <div class="col-sm-4">
+        <input
+          type="number"
+          id="horsepowerMax"
+          class="form-control"
+          formControlName="horsepowerMax"
+        />
+      </div>
+    </div> -->
+
+    <!-- Model Year Filter -->
+    <div class="form-group row">
+      <label for="modelYear" class="col-sm-2 col-form-label">Model Year</label>
+      <div class="col-sm-10">
+        <select
+          id="modelYear"
+          class="form-control"
+          formControlName="selectedModelYear"
+        >
+          <option [ngValue]="null">Any</option>
+          <option *ngFor="let year of modelYears" [value]="year">
+            {{ year }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Origin Filter -->
+    <div class="form-group row">
+      <label for="origin" class="col-sm-2 col-form-label">Origin</label>
+      <div class="col-sm-10">
+        <select
+          id="origin"
+          class="form-control"
+          formControlName="selectedOrigin"
+        >
+          <option [ngValue]="null">Any</option>
+          <option *ngFor="let origin of origins" [value]="origin">
+            {{ origin | capitalize }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="form-group row">
+      <div class="col-sm-12 text-right">
+        <button type="submit" class="btn btn-success">Search</button>
+      </div>
+    </div>
+  </form>
+</div>
