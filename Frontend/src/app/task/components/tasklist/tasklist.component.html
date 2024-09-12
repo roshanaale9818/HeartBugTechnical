@@ -6,47 +6,15 @@
       <button class="btn btn-primary mr-2" (click)="addNewTask()">
         Add New Task
       </button>
-      <!-- <input
-        type="file"
-        accept=".csv"
-        (change)="onFileChange($event)"
-        hidden
-        #fileInput
-      />
-      <button class="btn btn-info text-white mr-2" (click)="selectCSV()">
-        Upload CSV
-      </button> -->
-      <ng-container *ngIf="selectedFileName">
-        {{ selectedFileName }}
-        <button
-          class="btn btn-success btn-sm text-white mr-2"
-          (click)="onUploadCSV()"
-        >
-          {{ isUploading ? "Uploading..." : "Upload" }}
-        </button>
-      </ng-container>
     </div>
   </div>
 
-  <!-- Toggle Advanced Filters -->
-  <!-- <div class="row mb-3">
-    <div class="col-md-12 text-right">
-      <button class="btn btn-secondary" (click)="toggleAdvancedFilters()">
-        {{ showAdvancedFilters ? "Hide" : "Show" }} Advanced Filters
-      </button>
-    </div>
-  </div> -->
-
   <!-- Advanced Filters -->
-  <div>
-    <div class="col-md-4 mb-2">
-      <input
-        type="text"
-        class="form-control"
-        placeholder="Search tasks Eg. Task Title"
-        [(ngModel)]="searchedTaskTitle"
-        (ngModelChange)="search()"
-      />
+  <div class="row">
+    <div class="col-12 col-md-6">
+      <app-task-filter
+        (filterChanged)="onFilterChanged($event)"
+      ></app-task-filter>
     </div>
   </div>
 
@@ -103,6 +71,16 @@
         </ng-container>
       </tbody>
     </table>
+    <div class="loader-div">
+      <ngx-spinner
+        bdColor="rgba(0, 0, 0, 0.8)"
+        size="medium"
+        color="#fff"
+        type="ball-scale-multiple"
+        [fullScreen]="false"
+        ><p style="color: white">Loading...</p></ngx-spinner
+      >
+    </div>
   </div>
 </div>
 

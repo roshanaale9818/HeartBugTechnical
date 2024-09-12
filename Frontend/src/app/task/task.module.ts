@@ -8,6 +8,7 @@ import { ModalComponent } from '../shared/components/modal/modal.component';
 import { SharedModule } from '../shared/shared.module';
 import { TasklistComponent } from './components/tasklist/tasklist.component';
 import { TaskFilterComponent } from './components/task-filter/task-filter.component';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 @NgModule({
   declarations: [TasklistComponent, TaskFilterComponent],
@@ -19,6 +20,7 @@ import { TaskFilterComponent } from './components/task-filter/task-filter.compon
     TaskFormComponent,
     ModalComponent,
     SharedModule,
+    NgxSpinnerModule,
   ],
   exports: [TaskFilterComponent],
 })

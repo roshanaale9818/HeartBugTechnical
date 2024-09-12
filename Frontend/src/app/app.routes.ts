@@ -11,10 +11,6 @@ export const routes: Routes = [
     path: 'home',
     loadChildren: () => import('./home/home.module').then((m) => m.HomeModule),
   },
-  // {
-  //   path: 'cars',
-  //   loadChildren: () => import('./car/car.module').then((m) => m.CarModule),
-  // },
   {
     path: 'tasks',
     loadChildren: () => import('./task/task.module').then((m) => m.TaskModule),

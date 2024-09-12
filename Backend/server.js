@@ -84,7 +84,7 @@ app.get("/task", async (req, res) => {
     }
 
     if (dueDate) {
-      tasksQuery = tasksQuery.where("dueDate", ">=", new Date(dueDate));
+      tasksQuery = tasksQuery.where("dueDate", "==", dueDate);
     }
 
     // Fetch the filtered data
@@ -96,11 +96,14 @@ app.get("/task", async (req, res) => {
       ...doc.data(),
     }));
 
-    return res.status(200).send({
-      status: "ok",
-      message: "Filtered data retrieved successfully",
-      data: tasks,
-    });
+    // Delay the response by 3 seconds
+    setTimeout(() => {
+      return res.status(200).send({
+        status: "ok",
+        message: "Filtered data retrieved successfully",
+        data: tasks,
+      });
+    }, 2000);
   } catch (error) {
     return res.status(500).send({ status: "error", message: error.message });
   }
@@ -161,32 +164,6 @@ app.put("/task/:id", async (req, res) => {
 });
 
 const upload = multer({ dest: "uploads/" });
-
-// app.post("/upload-csv", upload.single("file"), (req, res) => {
-//   if (!req.file) {
-//     return res
-//       .status(400)
-//       .send({ status: "error", message: "No file uploaded" });
-//   }
-
-//   const results = [];
-//   fs.createReadStream(req.file.path)
-//     .pipe(csvParser())
-//     .on("data", (data) => results.push(data))
-//     .on("end", async () => {
-//       try {
-//         for (const car of results) {
-//           await db.collection("cars").add(car);
-//         }
-//         res.status(200).send({
-//           status: "ok",
-//           message: "CSV uploaded and data saved to Firestore",
-//         });
-//       } catch (error) {
-//         res.status(500).send({ status: "error", message: error.message });
-//       }
-//     });
-// });
 
 app.post("/upload-csv", upload.single("file"), (req, res) => {
   if (!req.file) {

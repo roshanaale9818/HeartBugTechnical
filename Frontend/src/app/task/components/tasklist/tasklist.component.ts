@@ -4,6 +4,8 @@ import { ModalService } from '../../../core/services/modal.service';
 import { Task } from '../../../shared/model/task.model';
 import { CustomResponse } from '../../../shared/model/user.model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { AlertService } from '../../../core/services/alert.service';
 
 @Component({
   selector: 'app-tasklist',
@@ -24,7 +26,9 @@ export class TasklistComponent {
   constructor(
     private taskService: TaskService,
     private modalService: ModalService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private spinnerService: NgxSpinnerService,
+    private alertService: AlertService
   ) {
     const today = new Date();
     const dueDate = new Date(today);
@@ -73,7 +77,8 @@ export class TasklistComponent {
 
   loadTasks(): void {
     this.isLoading = true;
-    const savedFilters = localStorage.getItem('searchFilters');
+    this.spinnerService.show();
+    const savedFilters = localStorage.getItem('taskFilters');
     let searchParams;
     let filter;
     if (savedFilters) {
@@ -95,6 +100,7 @@ export class TasklistComponent {
           this.tasks = [];
         }
         this.isLoading = false;
+        this.spinnerService.hide();
       });
   }
 
@@ -133,7 +139,7 @@ export class TasklistComponent {
       this.taskService.deleteTask(task).subscribe((res: CustomResponse) => {
         if (res.status == 'ok') {
           this.loadTasks();
-          alert('Task deleted successfully.');
+          this.alertService.showSuccess('Task deleted successfully.');
         }
       });
     }
@@ -158,20 +164,24 @@ export class TasklistComponent {
           .subscribe((res: CustomResponse) => {
             if (res.status == 'ok') {
               this.onCloseDialog();
-              alert('Task updated successfully.');
+              this.alertService.showSuccess('Task updated successfully.');
               this.loadTasks();
             } else {
-              alert('Failed to update task. Please try again later.');
+              this.alertService.showError(
+                'Failed to update task. Please try again later.'
+              );
             }
           });
       } else {
         this.taskService.addTask(newTask).subscribe((res: CustomResponse) => {
           if (res.status == 'ok') {
             this.onCloseDialog();
-            alert('Task saved successfully.');
+            this.alertService.showSuccess('Task saved successfully.');
             this.loadTasks();
           } else {
-            alert('Failed to save task. Please try again later.');
+            this.alertService.showError(
+              'Failed to save task. Please try again later.'
+            );
           }
         });
       }

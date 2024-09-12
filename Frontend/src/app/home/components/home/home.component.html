@@ -20,8 +20,7 @@
             <p class="card-text lead pt-2">
               Stay organized and keep track of your tasks effortlessly. Add,
               filter, and search through your tasks to find what needs to be
-              done quickly. Remember to save your progress or download your list
-              as a CSV file for backup.
+              done quickly.
             </p>
             <button
               class="btn btn-primary me-2"
@@ -150,7 +149,7 @@
 
     <!-- Submit Button -->
     <div class="modal-footer mt-4">
-      <button type="submit" class="btn btn-primary">Save</button>
+      <button type="submit" class="btn btn-primary" [disabled]="">Save</button>
       <button type="button" class="btn btn-danger" (click)="onCloseDialog()">
         Close
       </button>

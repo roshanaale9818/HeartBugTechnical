@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { User } from '../../model/user.model';
-import { CarService } from '../../../car/services/car.service';
 import { HttpClient } from '@angular/common/http';
 import { environments } from '../../../environments/environment.prod';
 
@@ -44,4 +43,7 @@ export class NavbarComponent {
     }
   }
   constructor(private http: HttpClient) {}
+  onProfile() {
+    console.error('not implemented yet.');
+  }
 }
