@@ -11,6 +11,9 @@ let CORS = [
   {
     origin: "http://roshanaalemagar.com:3000",
   },
+  {
+    origin: "http://roshanaalemagar.com:8083",
+  },
 ];
 const allowedCorsList = CORS.map((x) => x.origin);
 module.exports = { CORS, allowedCorsList };
